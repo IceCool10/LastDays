@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Trait" load_steps=2 format=3 uid="uid://doradtog1g13t"]
+
+[ext_resource type="Script" uid="uid://p0pmdnkucarm" path="res://scripts/trait.gd" id="1_em8qu"]
+
+[resource]
+script = ExtResource("1_em8qu")
+id = "brave"
+displayName = "Brave"
+description = "More likely to succeed in dangerous situations."
+expeditionModifiers = {
+"combat": 1.2,
+"scavenge": 1.0,
+"social": 1.0,
+"stealth": 1.0
+}
+memoryModifiers = {
+"fear": 0.8,
+"trust": 1.0
+}
+metadata/_custom_type_script = "uid://p0pmdnkucarm"

@@ -1,0 +1,127 @@
+[gd_scene load_steps=3 format=3 uid="uid://sinl6co4xa8h"]
+
+[ext_resource type="Script" uid="uid://cjktuohc2sbwr" path="res://scripts/ShelterCharacter.gd" id="1_glv2v"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glv2v"]
+bg_color = Color(0.7521366, 0.5410555, 0.4950084, 1)
+
+[node name="Main" type="Node2D"]
+
+[node name="Background" type="TextureRect" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Family" type="Node2D" parent="."]
+
+[node name="Father" type="Sprite2D" parent="Family"]
+script = ExtResource("1_glv2v")
+
+[node name="Mother" type="Sprite2D" parent="Family"]
+script = ExtResource("1_glv2v")
+
+[node name="Son" type="Sprite2D" parent="Family"]
+script = ExtResource("1_glv2v")
+
+[node name="Daughter" type="Sprite2D" parent="Family"]
+script = ExtResource("1_glv2v")
+
+[node name="CanvasLayer_UI" type="CanvasLayer" parent="."]
+
+[node name="ResourceHBox" type="HBoxContainer" parent="CanvasLayer_UI"]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="FoodLabel" type="Label" parent="CanvasLayer_UI/ResourceHBox"]
+layout_mode = 2
+
+[node name="WaterLabel" type="Label" parent="CanvasLayer_UI/ResourceHBox"]
+layout_mode = 2
+
+[node name="NextDayButton" type="Button" parent="CanvasLayer_UI"]
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="DiaryUI" type="Panel" parent="CanvasLayer_UI"]
+visible = false
+custom_minimum_size = Vector2(600, 800)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -400.0
+offset_right = 300.0
+offset_bottom = 400.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_glv2v")
+
+[node name="PreviousPageButton" type="Button" parent="CanvasLayer_UI/DiaryUI"]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="NextPageButton" type="Button" parent="CanvasLayer_UI/DiaryUI"]
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0
+
+[node name="StoryPage" type="Control" parent="CanvasLayer_UI/DiaryUI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScrollContainer" type="ScrollContainer" parent="CanvasLayer_UI/DiaryUI/StoryPage"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = 40.0
+offset_right = -40.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer_UI/DiaryUI/StoryPage/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+alignment = 1
+
+[node name="RichTextLabel" type="RichTextLabel" parent="CanvasLayer_UI/DiaryUI/StoryPage/ScrollContainer/VBoxContainer"]
+layout_mode = 2
+text = "
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent pretium eget nisi in efficitur. Donec a congue est. Phasellus eget mauris at nisi fringilla tincidunt. Fusce vehicula urna sollicitudin metus efficitur blandit. Nullam posuere non quam at rhoncus. Aliquam lobortis scelerisque lorem sed ultrices. In hac habitasse platea dictumst. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Suspendisse auctor faucibus ex. Aenean elementum gravida nunc. Vestibulum lacinia enim nisl, id malesuada enim fringilla non.
+
+Fusce nibh nulla, tempus a tempor eget, cursus a quam. Aenean a tellus dui. Quisque in augue justo. Maecenas commodo orci id sapien gravida rhoncus. Duis sit amet ligula vel lacus maximus pellentesque. Nullam tristique auctor leo. In et iaculis turpis.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis pretium, sapien sit amet consectetur ornare, justo nisi ornare nulla, id ullamcorper nisl orci nec leo. Donec auctor tellus sed faucibus tincidunt. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Maecenas maximus pulvinar viverra. Nulla facilisi. Maecenas sed diam sed mauris hendrerit viverra non a turpis. Nulla posuere viverra enim quis finibus.
+
+Praesent tempus metus at semper venenatis. Curabitur id ipsum tortor. Vestibulum ut nisi lacinia, pulvinar quam eget, rutrum est. Nulla lobortis pharetra dui at fringilla. Sed ac odio suscipit, interdum sem nec, consequat tellus. Fusce rutrum quis odio hendrerit porttitor. Etiam laoreet pharetra eros id sollicitudin. Pellentesque pretium velit ac condimentum tempus. Sed ex magna, pharetra quis fermentum sit amet, maximus in diam.
+
+Morbi turpis ante, bibendum at augue ut, lacinia vulputate eros. Nulla congue suscipit maximus. Pellentesque vitae pellentesque erat, vel venenatis massa. Nulla varius, leo et vehicula tincidunt, nunc quam cursus purus, et lobortis nisi ante in velit. Aenean vehicula nulla sit amet odio cursus, eu ultrices neque maximus. Nullam diam arcu, consectetur id sollicitudin nec, ultrices ut sapien. Morbi lobortis, lacus vitae placerat tempus, ligula est efficitur augue, vitae tincidunt leo dolor egestas est. Vestibulum odio lorem, faucibus varius purus a, porta maximus nulla.
+
+Vivamus blandit, tellus id faucibus tempor, orci risus iaculis neque, aliquam fringilla augue ligula sed nibh. Sed sed lacus a dolor mattis malesuada non blandit lorem. Aliquam nisl massa, fermentum eget blandit eu, porta a turpis. Duis pharetra risus in sapien lobortis, eu ultrices neque maximus. Sed orci ligula, ornare non est in, venenatis volutpat neque. Pellentesque rutrum lorem a quam aliquet pulvinar. Cras efficitur consequat magna efficitur mollis.
+
+Sed dapibus erat a nisl viverra, non scelerisque augue dignissim. Duis at iaculis neque. Vestibulum sed tincidunt velit, ac interdum felis. Donec sagittis eget eros at pretium. Pellentesque eget consectetur neque, vitae fermentum nibh. Nulla tincidunt neque nec massa sodales bibendum. Nulla mollis euismod elit et commodo. Etiam vulputate nunc in ornare placerat. Maecenas ac urna eget augue eleifend bibendum sit amet id elit.
+
+Nunc volutpat lorem eu suscipit luctus. Mauris bibendum mi dictum leo efficitur, at feugiat ipsum vehicula. Integer condimentum ultricies augue sit amet aliquam. Morbi non condimentum lectus. Suspendisse at ante diam. Aliquam rhoncus nibh orci, nec luctus felis consectetur non. Etiam eleifend feugiat eros. Duis vehicula pellentesque magna. Vivamus mi purus, maximus sit amet magna ut, tincidunt dictum sem. Curabitur ac metus a magna lobortis viverra id ac augue. Aliquam suscipit neque est, nec ornare arcu condimentum vitae. Integer posuere dolor at est dictum, et tempus enim finibus. Fusce a posuere enim, vitae pellentesque dui. Pellentesque nec neque augue. Nam varius non lacus sed placerat. Nunc efficitur nisi vitae lectus convallis, ac blandit lorem vestibulum.
+
+Nam porta lacus at sem malesuada, nec ultricies odio dignissim. Integer eget lacus eget purus vehicula varius. Cras auctor nec magna varius vestibulum. Aliquam nec elementum tortor. Integer dictum dapibus vehicula. Phasellus a ultrices elit. Sed tempus consequat lorem nec facilisis. Proin porta iaculis ultricies. Integer iaculis sagittis mi, id consectetur metus aliquam a. Quisque in mollis ex, ut interdum erat. Pellentesque sed nunc in risus dapibus tristique eget non metus. Donec eu sem viverra, vulputate velit a, elementum magna. Donec nec nisi erat. In blandit facilisis mi, iaculis ultricies ante blandit at. Nam consectetur, dui ut interdum tincidunt, elit risus ullamcorper magna, sed dictum diam odio condimentum nulla.
+
+Donec suscipit semper vestibulum. Phasellus lacinia orci at mauris venenatis ullamcorper. Nam rutrum tempor libero a sollicitudin. Phasellus blandit vel felis ut pulvinar. Pellentesque non suscipit sapien, ut hendrerit dui. Nullam sagittis blandit tortor, vel congue leo. Nunc consectetur vel diam eu mattis. Aliquam erat volutpat. Aliquam sit amet tristique nunc, vitae aliquam elit. Sed placerat sed ante varius luctus. Proin quam erat, eleifend vel blandit a, maximus sed magna. Nullam est dolor, facilisis sed dapibus at, blandit commodo urna. In vestibulum commodo bibendum. Mauris vitae lorem nisi. Vestibulum nisl nisl, ultrices id euismod in, sagittis at erat. Nulla tortor lacus, facilisis sed felis vel, ultricies ultrices tortor.
+
+Duis efficitur ex nec tellus sagittis, id sagittis felis fermentum. Vivamus auctor congue faucibus. Pellentesque eget libero et ex aliquet porttitor. Maecenas bibendum, tortor vel lacinia blandit, mi ex facilisis augue, nec tincidunt velit nibh sed lacus. Curabitur vestibulum eros justo. Suspendisse elementum accumsan vestibulum. Phasellus viverra risus quis vulputate condimentum. Duis vestibulum ullamcorper turpis, sit amet consectetur est suscipit ac. Nullam id accumsan elit, in bibendum ipsum. Morbi interdum egestas odio, at molestie libero lobortis non. Cras aliquet bibendum risus. Pellentesque finibus odio a urna tempor semper.
+
+Integer sed blandit purus. Proin tempor tortor in nunc ornare, iaculis bibendum felis gravida. Nulla congue urna non sapien egestas dignissim. Nam imperdiet semper risus in laoreet. Pellentesque gravida orci quis ullamcorper semper. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Praesent et blandit libero. Sed gravida faucibus enim a tincidunt. Donec finibus lectus quis enim ornare, sit amet vehicula lacus feugiat. Donec et congue tellus. Aliquam porttitor laoreet magna id volutpat. Vestibulum gravida nec diam nec faucibus. Curabitur bibendum convallis interdum."
+fit_content = true
+
+[node name="FeedingPage" type="Control" parent="CanvasLayer_UI/DiaryUI"]
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0

@@ -1,0 +1,372 @@
+extends Node2D
+
+
+    # Called when the node enters the scene tree for the first time.
+
+var day := 1
+var characters := []
+var characterButtons := {}  # key = character name, value = {"feed": TextureButton, "water": TextureButton}
+
+@onready var dayLabelLoading := $CanvasLayer/LoadingScreen/DayLabelLoading
+@onready var loadingScreen := $CanvasLayer/LoadingScreen
+@onready var charactersVBox := $CanvasLayer/CharactersVBox
+@onready var nextDayButton := $CanvasLayer/NextDayButton
+@onready var foodLabel := $CanvasLayer/ResourcesHBox/FoodLabel
+@onready var waterLabel := $CanvasLayer/ResourcesHBox/WaterLabel
+@onready var eventPanel := $CanvasLayer/EventPanel
+@onready var eventLabel := eventPanel.get_node("EventLabel")
+@onready var eventButtonsContainer := eventPanel.get_node("ButtonsHBox")
+@onready var testEventButton := $CanvasLayer/TestEventButton
+
+
+
+
+var food := 10
+var water := 10
+var feedAllActive := false
+var waterAllActive := false
+
+func _ready():
+    randomize()
+    # 1. Initialize the backend
+    GameManager.start_new_game()
+    
+    # 2. Setup the "Model" (The character data list)
+    # This connects your GameManager data to the local 'characters' array
+    characters = GameManager.current_state.characters.values()
+    
+    # 3. Update the existing portraits in the scene
+    for child in $CanvasLayer/CharactersVBox.get_children():
+        if child.has_method("update_appearance"):
+            child.update_appearance()
+            
+    # Access the data to verify (Arthur test)
+    var arthur_health = GameManager.current_state.characters.father.health
+    print("Arthur's starting health: ", arthur_health)
+    
+    nextDayButton.pressed.connect(_onNextDayButtonPressed)
+    testEventButton.pressed.connect(_onTestEventPressed)
+    loadingScreen.visible = false
+
+func _onTestEventPressed():
+    # Pick a test event from EventDb
+    var testEvent = EventDb.getRandomEvent()  # Make sure you have this function
+    showEvent(testEvent)
+
+func getActiveFeedCount() -> int:
+    var count := 0
+    for buttons in characterButtons.values():
+        if buttons["feed"].button_pressed:
+            count += 1
+    return count
+    
+func getActiveWaterCount() -> int:
+    var count := 0
+    for buttons in characterButtons.values():
+        if buttons["water"].button_pressed:
+            count += 1
+    return count
+    
+func updateFeedButtonAvailability():
+    var activeFeeds = getActiveFeedCount()
+
+    for buttons in characterButtons.values():
+        var feedButton = buttons["feed"]
+
+        # Allow unchecking always
+        if feedButton.button_pressed:
+            feedButton.disabled = false
+            feedButton.modulate = Color(1,1,1,1.0)
+        else:
+            feedButton.disabled = activeFeeds >= food
+            if feedButton.disabled:
+                feedButton.modulate = Color(1,1,1,0.2)
+            else:
+                feedButton.modulate = Color(1,1,1,0.5)
+            
+func updateWaterButtonAvailability():
+    var activeFeeds = getActiveWaterCount()
+
+    for buttons in characterButtons.values():
+        var waterButton = buttons["water"]
+
+        # Allow unchecking always
+        if waterButton.button_pressed:
+            waterButton.disabled = false
+            waterButton.modulate = Color(1,1,1,1.0)
+        else:
+            waterButton.disabled = activeFeeds >= water
+            if waterButton.disabled:
+                waterButton.modulate = Color(1,1,1,0.2)
+            else:
+                waterButton.modulate = Color(1,1,1,0.5)
+
+func createGlobalActionButton(texture_path: String) -> TextureButton:
+    var button = TextureButton.new()
+    button.toggle_mode = false
+    button.custom_minimum_size = Vector2(64, 64)
+    button.ignore_texture_size = true
+    button.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+
+    var tex = load(texture_path)
+    button.texture_normal = tex
+    button.texture_pressed = tex
+    button.texture_hover = tex
+
+    return button         
+
+func _onFeedAllPressed():
+    feedAllActive = !feedAllActive  # toggle state
+
+    var remainingFood = food
+
+    for c in characters:
+        var buttons = characterButtons.get(c.name)
+        if buttons:
+            var feedButton = buttons["feed"]
+
+            if feedAllActive:
+                # Check if food available
+                if remainingFood > 0 and not feedButton.button_pressed:
+                    feedButton.button_pressed = true
+                    remainingFood -= 1
+            else:
+                # Uncheck all
+                if feedButton.button_pressed:
+                    feedButton.button_pressed = false
+
+    updateFeedButtonAvailability()
+
+       
+func _onWaterAllPressed():
+    waterAllActive = !waterAllActive
+
+    var remainingWater = water
+
+    for c in characters:
+        var buttons = characterButtons.get(c.name)
+        if buttons:
+            var waterButton = buttons["water"]
+
+            if waterAllActive:
+                if remainingWater > 0 and not waterButton.button_pressed:
+                    waterButton.button_pressed = true
+                    remainingWater -= 1
+            else:
+                if waterButton.button_pressed:
+                    waterButton.button_pressed = false
+
+    updateWaterButtonAvailability()  
+
+func selectOnlyThis(selectedBtn: Button):
+    for btn in eventButtonsContainer.get_children():
+        if btn != selectedBtn:
+            btn.pressed = false
+
+func _onEventCharacterSelected(character: Character, event: GEvent):
+    EventDb.trigger_event(character, event)
+    eventPanel.visible = false
+    print("Event applied to", character.name)
+    updateUI()
+
+func _onEventYesNoSelected(event: GEvent, choice: bool):
+    EventDb.trigger_event_choice(event, choice)
+    eventPanel.visible = false
+    print("Event choice:", choice)
+    updateUI()
+
+func showEvent(event: GEvent):
+    eventPanel.visible = true
+    eventLabel.text = event.description
+    
+    # Clear previous buttons
+    for child in eventButtonsContainer.get_children():
+        child.queue_free()
+    
+    if event.target_type == "character":
+        # Character selection: toggle buttons, allow only one
+        for c in characters:
+            var btn = Button.new()
+            btn.text = c.name
+            btn.toggle_mode = true
+            btn.pressed.connect(func(): selectOnlyThis(btn))  # helper to allow only 1
+            btn.connect("pressed", Callable(self, "_onEventCharacterSelected").bind(c, event))
+            eventButtonsContainer.add_child(btn)
+    elif event.target_type == "yes_no":
+        var yesBtn = Button.new()
+        yesBtn.text = "Yes"
+        yesBtn.connect("pressed", Callable(self, "_onEventYesNoSelected").bind(event, true))
+        eventButtonsContainer.add_child(yesBtn)
+        
+        var noBtn = Button.new()
+        noBtn.text = "No"
+        noBtn.connect("pressed", Callable(self, "_onEventYesNoSelected").bind(event, false))
+        eventButtonsContainer.add_child(noBtn)
+                            
+var character_scene_prefab = preload("res://character_scene.tscn")
+
+func updateUI():
+    # Update day label on loading screen
+    dayLabelLoading.text = "Day: %d" % day
+    foodLabel.text = "Food: %d" % food
+    waterLabel.text = "Water: %d" % water
+    # Clear previous UI
+    for child in charactersVBox.get_children():
+        child.queue_free()
+        
+    
+    # Main horizontal row for all characters
+    var mainRow = HBoxContainer.new()
+    charactersVBox.add_child(mainRow)
+
+    for c in characters:
+        var charBox = VBoxContainer.new()
+        var characterNode = character_scene_prefab.instantiate()
+        
+        # 1. ASSIGN THE KEY (This connects the data to the column index) [cite: 1, 13]
+        characterNode.character_key = c.name.to_lower() 
+
+        # 2. FIX THE SIZE (Your cells are 256x256, so give them room!) 
+        var portraitWrapper = Control.new()
+        portraitWrapper.custom_minimum_size = Vector2(256, 256) 
+        portraitWrapper.add_child(characterNode)
+        
+        # Force the node to fill its wrapper 
+        characterNode.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+        
+        # 3. TRIGGER THE UPDATE
+        characterNode.update_appearance()
+
+        # Icons row (buttons)
+        var iconsRow = HBoxContainer.new()
+        iconsRow.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+
+        # Feed button (TextureButton)
+        var feedButton = TextureButton.new()
+        feedButton.name = c.name + "_Feed"
+        feedButton.toggle_mode = true
+        feedButton.set_custom_minimum_size(Vector2(64,64))  # button size
+
+        # Load image and set properties
+        feedButton.ignore_texture_size = true
+        feedButton.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+        var tex = load("res://images/food.png")
+
+        feedButton.texture_normal = tex
+        feedButton.texture_pressed = tex
+        if food > 0:
+            feedButton.modulate = Color(1,1,1,0.5)
+        else:
+            feedButton.modulate = Color(1,1,1,0.2)
+        # Toggle transparency when pressed
+        feedButton.toggled.connect(func(pressed):
+            updateFeedButtonAvailability()
+            if pressed:
+                feedButton.modulate = Color(1,1,1,1)
+            else:
+                feedButton.modulate = Color(1,1,1,0.5)
+        )
+        feedButton.disabled = food <= 0
+        iconsRow.add_child(feedButton)
+
+       
+        var waterButton = TextureButton.new()
+        waterButton.name = c.name + "_Water"
+        waterButton.toggle_mode = true
+        waterButton.set_custom_minimum_size(Vector2(64,64))  # button size
+        waterButton.ignore_texture_size = true
+        waterButton.stretch_mode = TextureButton.STRETCH_KEEP_ASPECT_CENTERED
+
+        # Load image
+        tex = load("res://images/water.png")
+
+        waterButton.texture_normal = tex
+        waterButton.texture_pressed = tex
+        if water > 0:
+            waterButton.modulate = Color(1,1,1,0.5)
+        else:
+            waterButton.modulate = Color(1,1,1,0.2)
+        # Toggle transparency when pressed
+        waterButton.toggled.connect(func(pressed):
+            updateWaterButtonAvailability()
+            if pressed:
+                waterButton.modulate = Color(1,1,1,1)
+            else:
+                waterButton.modulate = Color(1,1,1,0.5)
+        )
+
+        waterButton.disabled = water <= 0
+        iconsRow.add_child(waterButton)
+        ## Name label, centered above buttons
+        var nameLabel = Label.new()
+        nameLabel.text = c.name
+        nameLabel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+        nameLabel.horizontal_alignment = Label.PRESET_CENTER
+
+        # Add label, portrait, and icons to character box
+        charBox.add_child(nameLabel)
+        charBox.add_child(portraitWrapper)
+        charBox.add_child(iconsRow)
+
+        # Add spacer to separate characters horizontally
+        var spacer = Control.new()
+        spacer.custom_minimum_size = Vector2(20,0)
+
+        mainRow.add_child(charBox)
+        mainRow.add_child(spacer)
+        characterButtons[c.name] = {"feed": feedButton, "water": waterButton}
+    
+    var globalRow = HBoxContainer.new()
+    globalRow.alignment = BoxContainer.ALIGNMENT_CENTER
+    charactersVBox.add_child(globalRow)
+    var feedAllButton = createGlobalActionButton("res://images/food.png")
+    var waterAllButton = createGlobalActionButton("res://images/water.png")
+    
+    feedAllButton.pressed.connect(func():
+        _onFeedAllPressed()
+    )
+
+    waterAllButton.pressed.connect(func():
+        _onWaterAllPressed()
+    )
+    globalRow.add_child(feedAllButton)
+    globalRow.add_child(waterAllButton)
+    
+func _onNextDayButtonPressed():
+    loadingScreen.visible = true
+    dayLabelLoading.text = "Day %d" % day
+    await get_tree().create_timer(1.2).timeout
+
+    # 1. Update backend data using the buttons
+    # We iterate through the character keys in our data (father, mother, etc.)
+    var state_chars = GameManager.current_state.characters
+    
+    for key in state_chars.keys():
+        var data = state_chars[key]
+        # We need to find the button using the character's NAME (e.g. "Arthur")
+        var char_name = data.name 
+        var buttons = characterButtons.get(char_name, null)
+        
+        if buttons:
+            if buttons["feed"].button_pressed and food > 0:
+                food -= 1
+                data.hunger_days = 0 # Reset hunger in backend
+                print(char_name, " FED")
+            else:
+                data.hunger_days += 1 # Increase hunger if not fed
+                
+            if buttons["water"].button_pressed and water > 0:
+                water -= 1
+                data.thirst_days = 0 # Reset thirst
+            else:
+                data.thirst_days += 1
+
+    # 2. Advance the day counter
+    day += 1
+    
+    # 3. Refresh the UI (This will trigger update_appearance and show new states)
+    updateUI()
+    loadingScreen.visible = false
+    # Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+    pass

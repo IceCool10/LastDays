@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://27kri3da2r8u"]
+
+[ext_resource type="Script" uid="uid://bnc3bga256j37" path="res://character_scene.gd" id="1_script"]
+
+[node name="CharacterScene" type="TextureRect"]
+script = ExtResource("1_script")
+
+[node name="CharacterDisplay" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+stretch_mode = 5

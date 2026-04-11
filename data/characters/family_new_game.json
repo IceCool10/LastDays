@@ -1,0 +1,12 @@
+{
+  "family": {
+    "father": { "name": "Arthur", "base_health": 100 },
+    "mother": { "name": "Ada", "base_health": 100 },
+    "son": { "name": "Leo", "base_health": 100 },
+    "daughter": { "name": "Alice", "base_health": 100 }
+  },
+  "starting_resources": { 
+    "soup": 4, 
+    "water": 4 
+  }
+}
