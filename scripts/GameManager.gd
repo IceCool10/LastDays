@@ -38,6 +38,7 @@ func start_new_game():
     var config = load_json("res://data/characters/family_new_game.json")
     
     if config.is_empty():
+        printerr("Config empty")
         return
 
     current_state = {

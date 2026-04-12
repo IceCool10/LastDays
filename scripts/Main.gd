@@ -8,12 +8,8 @@ extends Node2D
     "daughter": $Family/Daughter
 }
 
-@onready var foodLabel = $CanvasLayer/ResourcesHBox/FoodLabel
-@onready var waterLabel = $CanvasLayer/ResourcesHBox/WaterLabel
-@onready var nextDayButton = $CanvasLayer/NextDayButton
-@onready var diaryUI = $DiaryUI
-@onready var diaryText = $DiaryUI/RichTextLabel # Ensure you have this child!
-
+@onready var diaryUI = $CanvasLayer_UI/DiaryUI
+@onready var diaryText = $CanvasLayer_UI/DiaryUI/ScrollContainer/VBoxContainer/RichTextLabel
 # 2. Game Variables
 var day := 1
 var food := 10
@@ -27,8 +23,8 @@ func _ready():
     GameManager.start_new_game()
     
     # Connect the Next Day button if not done in editor
-    if not nextDayButton.pressed.is_connected(_onNextDayButtonPressed):
-        nextDayButton.pressed.connect(_onNextDayButtonPressed)
+    #if not nextDayButton.pressed.is_connected(_onNextDayButtonPressed):
+        #nextDayButton.pressed.connect(_onNextDayButtonPressed)
     
     refresh_shelter_view()
 
@@ -64,8 +60,8 @@ func _onNextDayButtonPressed():
 
 func refresh_shelter_view():
     # Update Labels
-    foodLabel.text = "Food: %d" % food
-    waterLabel.text = "Water: %d" % water
+    #foodLabel.text = "Food: %d" % food
+    #waterLabel.text = "Water: %d" % water
     
     # Update Character Sprites (swaps textures)
     for member in family_nodes.values():
