@@ -1,7 +1,8 @@
-[gd_scene load_steps=4 format=3 uid="uid://sinl6co4xa8h"]
+[gd_scene load_steps=5 format=3 uid="uid://sinl6co4xa8h"]
 
 [ext_resource type="Script" uid="uid://cjktuohc2sbwr" path="res://scripts/ShelterCharacter.gd" id="1_glv2v"]
 [ext_resource type="Script" uid="uid://dmmcghok7fr04" path="res://scripts/Main.gd" id="1_uu6xs"]
+[ext_resource type="Texture2D" uid="uid://bp7ltyet5n3x2" path="res://images/shelter_wide1.png" id="2_r0du0"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_glv2v"]
 bg_color = Color(0.7521366, 0.5410555, 0.4950084, 1)
@@ -10,8 +11,16 @@ bg_color = Color(0.7521366, 0.5410555, 0.4950084, 1)
 script = ExtResource("1_uu6xs")
 
 [node name="Background" type="TextureRect" parent="."]
-offset_right = 40.0
-offset_bottom = 40.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_r0du0")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="Family" type="Node2D" parent="."]
 
